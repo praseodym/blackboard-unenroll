@@ -1,0 +1,62 @@
+<!doctype html>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<style type="text/css">
+    body {
+        font-family: sans-serif;
+    }
+    #main {
+        background-color: #f6f6f6;
+        margin: 20px auto;
+        width: 700px;
+        padding: 15px;
+    }
+    h1 {
+        margin: 0;
+    }
+    #input {
+        width: 695px;
+        height: 200px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        overflow: auto;
+        margin-left: 2px;
+    }
+    #output h2 {
+        border-top: 1px solid #aaa;
+        margin: 1em 0 0 0;
+        padding: 0;
+    }
+</style>
+<title>Blackboard batch unenroll tool</title>
+
+<div id="main">
+<h1>TU Delft Blackboard batch unenroll tool</h1>
+<ol>
+    <li>Copy courses list from Blackboard and paste below
+    <li>Use the button to generate unenroll links
+    <li>Click links to unenroll
+</ol>
+
+<div id="input" contentEditable="true"></div>
+<button id="button">List courses</button>
+<div id="output"></div>
+
+<script type="text/javascript" charset="utf-8">
+$("#button").click(function() {
+    var input = $("#input").html();
+    var re = new RegExp("https://.*?Course%26id%3D(_\\d+_1).*?>(?:<br.*?>)*(?:\\d+-\\d+: )?(.*?)</a>", "ig");
+    
+    var courses = new Array();
+    var result;
+    while((result = re.exec(input)) !== null) {
+        courses.push([result[1], result[2]]);
+    }
+    
+    var prefix = "https://blackboard.tudelft.nl/webapps/3xo-unenroll-tool-bb_bb60/unenroll.jsp?course_id=" // CONFIRMED=confirmed&
+    var list = $("<ul/>").appendTo($('#output').html("<h2>Unenroll links</h2>"));
+    $.each(courses, function(i, course) {
+        var li = $('<li/>').appendTo(list);
+        $('<a/>').attr("href", prefix + course[0]).text(course[1]).appendTo(li);
+    });
+});
+</script>
